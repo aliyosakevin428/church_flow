@@ -8,6 +8,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\CommunityController;
+
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
 Route::get('/about', [WelcomeController::class, 'about'])->name('about');
@@ -28,6 +30,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('permission/resync', [PermissionController::class, 'resync'])->name('permission.resync');
     Route::apiResource('permission', PermissionController::class);
     Route::apiResource('doc', MediaController::class);
+    
+    Route::put('community/bulk', [CommunityController::class, 'bulkUpdate'])->name('community.bulk.update');
+    Route::delete('community/bulk', [CommunityController::class, 'bulkDelete'])->name('community.bulk.destroy');
+    Route::get('community/archived', [CommunityController::class, 'archived'])->name('community.archived');
+    Route::put('community/{community}/restore', [CommunityController::class, 'restore'])->name('community.restore');
+    Route::delete('community/{community}/force-delete', [CommunityController::class, 'forceDelete'])->name('community.force-delete');
+    Route::apiResource('community', CommunityController::class);
 });
 
 require __DIR__.'/settings.php';
