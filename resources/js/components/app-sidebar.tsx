@@ -44,12 +44,12 @@ export function AppSidebar() {
         <NavMain
           items={[
             ...mainNavItems,
-            // {
-            //   title: 'feature',
-            //   href: route('feature.index'),
-            //   icon: BookOpen,
-            //   available: menus.feature,
-            // },
+            {
+              title: 'Komunitas Gereja',
+              href: route('community.index'),
+              icon: BookOpen,
+              available: menus.community,
+            },
           ]}
           label="Dashboard"
         />
