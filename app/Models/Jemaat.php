@@ -8,17 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
-class Community extends Model
+class Jemaat extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'communities';
+
+
+    //protected $table = 'jemaats';
 
     /*
     protected $fillable = [
+        'user_id',
+        'komunitas_id',
         'name',
-        'description'
+        'tanggal_lahir',
+        'no_hp',
+        'email'
     ];
     */
 
@@ -28,9 +34,14 @@ class Community extends Model
         'updated_at',
     ];
 
-    public function jemaats()
+
+    public function user()
     {
-        return $this->hasMany(Jemaat::class, 'komunitas_id');
+        return $this->belongsTo(User::class);
     }
 
+    public function komunitas()
+    {
+        return $this->belongsTo(Community::class, 'komunitas_id');
+    }
 }
