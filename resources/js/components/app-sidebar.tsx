@@ -50,6 +50,12 @@ export function AppSidebar() {
               icon: BookOpen,
               available: menus.community,
             },
+            {
+              title: 'Data Jemaat',
+              href: route('jemaat.index'),
+              icon: Users,
+              available: menus.jemaat,
+            },
           ]}
           label="Dashboard"
         />

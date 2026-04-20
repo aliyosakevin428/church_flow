@@ -9,6 +9,8 @@ use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\JemaatController;
+
 
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
@@ -30,13 +32,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('permission/resync', [PermissionController::class, 'resync'])->name('permission.resync');
     Route::apiResource('permission', PermissionController::class);
     Route::apiResource('doc', MediaController::class);
-    
+
     Route::put('community/bulk', [CommunityController::class, 'bulkUpdate'])->name('community.bulk.update');
     Route::delete('community/bulk', [CommunityController::class, 'bulkDelete'])->name('community.bulk.destroy');
     Route::get('community/archived', [CommunityController::class, 'archived'])->name('community.archived');
     Route::put('community/{community}/restore', [CommunityController::class, 'restore'])->name('community.restore');
     Route::delete('community/{community}/force-delete', [CommunityController::class, 'forceDelete'])->name('community.force-delete');
     Route::apiResource('community', CommunityController::class);
+    
+    Route::put('jemaat/bulk', [JemaatController::class, 'bulkUpdate'])->name('jemaat.bulk.update');
+    Route::delete('jemaat/bulk', [JemaatController::class, 'bulkDelete'])->name('jemaat.bulk.destroy');
+    Route::get('jemaat/archived', [JemaatController::class, 'archived'])->name('jemaat.archived');
+    Route::put('jemaat/{jemaat}/restore', [JemaatController::class, 'restore'])->name('jemaat.restore');
+    Route::delete('jemaat/{jemaat}/force-delete', [JemaatController::class, 'forceDelete'])->name('jemaat.force-delete');
+    Route::apiResource('jemaat', JemaatController::class);
 });
 
 require __DIR__.'/settings.php';
