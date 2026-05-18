@@ -6,25 +6,26 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useViewMode } from '@/hooks/use-view-mode';
 import AppLayout from '@/layouts/app-layout';
-import { capitalizeWords, strLimit } from '@/lib/utils';
+import { capitalizeWords, dateDFY, strLimit } from '@/lib/utils';
 import { SharedData } from '@/types';
-import { Community } from '@/types/community';
-import { Link, router, usePage } from '@inertiajs/react';
-import { Archive, Edit, Filter, Folder, Grid2X2, TableIcon, Trash2 } from 'lucide-react';
+import { Article } from '@/types/article';
+import { Link, usePage } from '@inertiajs/react';
+import { Edit, Filter, Folder, Grid2X2, Image, TableIcon, Trash2 } from 'lucide-react';
 import { FC, useState } from 'react';
-import CommunityBulkDeleteDialog from './components/community-bulk-delete-dialog';
-import CommunityBulkEditSheet from './components/community-bulk-edit-sheet';
-import CommunityDeleteDialog from './components/community-delete-dialog';
-import CommunityFilterSheet from './components/community-filter-sheet';
-import CommunityFormSheet from './components/community-form-sheet';
-import CommunityItemCard from './components/community-item-card';
+import ArticleBulkDeleteDialog from './components/article-bulk-delete-dialog';
+import ArticleBulkEditSheet from './components/article-bulk-edit-sheet';
+import ArticleDeleteDialog from './components/article-delete-dialog';
+import ArticleFilterSheet from './components/article-filter-sheet';
+import ArticleFormSheet from './components/article-form-sheet';
+import ArticleItemCard from './components/article-item-card';
+import ArticleUploadMediaSheet from './components/article-upload-sheet';
 
 type Props = {
-  communities: Community[];
+  articles: Article[];
   query: { [key: string]: string };
 };
 
-const CommunityList: FC<Props> = ({ communities, query }) => {
+const ArticleList: FC<Props> = ({ articles, query }) => {
   const { mode, toggle } = useViewMode();
   const [ids, setIds] = useState<number[]>([]);
   const [cari, setCari] = useState('');
@@ -33,24 +34,19 @@ const CommunityList: FC<Props> = ({ communities, query }) => {
 
   return (
     <AppLayout
-      title="Communitys"
-      description="Manage your communities"
+      title="Articles"
+      description="Manage your articles"
       actions={[
         {
           title: capitalizeWords(mode) + ' view',
           icon: mode === 'grid' ? Grid2X2 : TableIcon,
           onClick: toggle,
         },
-        {
-          title: 'Archived',
-          icon: Archive,
-          onClick: () => router.visit(route('community.archived')),
-        },
       ]}
     >
       <div className="flex gap-2">
-        <Input placeholder="Search communities..." value={cari} onChange={(e) => setCari(e.target.value)} />
-        <CommunityFilterSheet query={query}>
+        <Input placeholder="Search articles..." value={cari} onChange={(e) => setCari(e.target.value)} />
+        <ArticleFilterSheet query={query}>
           <Button>
             <Filter />
             Filter data
@@ -58,25 +54,25 @@ const CommunityList: FC<Props> = ({ communities, query }) => {
               <Badge variant="secondary">{Object.values(query).filter((val) => val && val !== '').length}</Badge>
             )}
           </Button>
-        </CommunityFilterSheet>
+        </ArticleFilterSheet>
         {ids.length > 0 && (
           <>
             <Button variant={'ghost'} disabled>
               {ids.length} item selected
             </Button>
-            <CommunityBulkEditSheet communityIds={ids} onSuccess={() => setIds([])}>
+            <ArticleBulkEditSheet articleIds={ids} onSuccess={() => setIds([])}>
               <Button>
                 <Edit /> Edit selected
               </Button>
-            </CommunityBulkEditSheet>
-            <CommunityBulkDeleteDialog communityIds={ids} onSuccess={() => setIds([])}>
+            </ArticleBulkEditSheet>
+            <ArticleBulkDeleteDialog articleIds={ids} onSuccess={() => setIds([])}>
               <Button variant={'destructive'}>
                 <Trash2 /> Delete selected
               </Button>
-            </CommunityBulkDeleteDialog>
+            </ArticleBulkDeleteDialog>
           </>
         )}
-        {permissions?.canAdd && <CommunityFormSheet purpose="create" buttonLabel="New community" />}
+        {permissions?.canAdd && <ArticleFormSheet purpose="create" buttonLabel="New article" />}
       </div>
       {mode === 'table' ? (
         <Table>
@@ -86,10 +82,10 @@ const CommunityList: FC<Props> = ({ communities, query }) => {
                 <Button variant={'ghost'} size={'icon'} asChild>
                   <Label>
                     <Checkbox
-                      checked={ids.length === communities.length}
+                      checked={ids.length === articles.length}
                       onCheckedChange={(checked) => {
                         if (checked) {
-                          setIds(communities.map((community) => community.id));
+                          setIds(articles.map((article) => article.id));
                         } else {
                           setIds([]);
                         }
@@ -98,53 +94,64 @@ const CommunityList: FC<Props> = ({ communities, query }) => {
                   </Label>
                 </Button>
               </TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Description</TableHead>
+              <TableHead>Komunitas</TableHead>
+              <TableHead>Judul Artikel</TableHead>
+              <TableHead>Isi Artikel</TableHead>
+              <TableHead>Created By</TableHead>
+              <TableHead>Created At</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {communities
-              .filter((community) => JSON.stringify(community).toLowerCase().includes(cari.toLowerCase()))
-              .map((community) => (
-                <TableRow key={community.id}>
+            {articles
+              .filter((article) => JSON.stringify(article).toLowerCase().includes(cari.toLowerCase()))
+              .map((article) => (
+                <TableRow key={article.id}>
                   <TableCell>
                     <Button variant={'ghost'} size={'icon'} asChild>
                       <Label>
                         <Checkbox
-                          checked={ids.includes(community.id)}
+                          checked={ids.includes(article.id)}
                           onCheckedChange={(checked) => {
                             if (checked) {
-                              setIds([...ids, community.id]);
+                              setIds([...ids, article.id]);
                             } else {
-                              setIds(ids.filter((id) => id !== community.id));
+                              setIds(ids.filter((id) => id !== article.id));
                             }
                           }}
                         />
                       </Label>
                     </Button>
                   </TableCell>
-                  <TableCell>{community.name}</TableCell>
-                  <TableCell>{strLimit(community.description, 50) || '-'}</TableCell>
+                  <TableCell>{article.komunitas?.name || '-'}</TableCell>
+                  <TableCell>{strLimit(article.title, 30)}</TableCell>
+                  <TableCell>{strLimit(article.content, 30)}</TableCell>
+                  <TableCell>{article.user?.name || '-'}</TableCell>
+                  <TableCell>{dateDFY(article.created_at)}</TableCell>
                   <TableCell>
                     {permissions?.canShow && (
                       <Button variant={'ghost'} size={'icon'}>
-                        <Link href={route('community.show', community.id)}>
+                        <Link href={route('article.show', article.id)}>
                           <Folder />
                         </Link>
                       </Button>
                     )}
                     {permissions?.canUpdate && (
                       <>
-                        <CommunityFormSheet purpose="edit" community={community} variant="icon" />
+                        <ArticleUploadMediaSheet article={article}>
+                          <Button variant={'ghost'} size={'icon'}>
+                            <Image />
+                          </Button>
+                        </ArticleUploadMediaSheet>
+                        <ArticleFormSheet purpose="edit" article={article} variant="icon" />
                       </>
                     )}
                     {permissions?.canDelete && (
-                      <CommunityDeleteDialog community={community}>
+                      <ArticleDeleteDialog article={article}>
                         <Button variant={'ghost'} size={'icon'}>
                           <Trash2 />
                         </Button>
-                      </CommunityDeleteDialog>
+                      </ArticleDeleteDialog>
                     )}
                   </TableCell>
                 </TableRow>
@@ -153,10 +160,10 @@ const CommunityList: FC<Props> = ({ communities, query }) => {
         </Table>
       ) : (
         <div className="grid-responsive grid gap-4">
-          {communities
-            .filter((community) => JSON.stringify(community).toLowerCase().includes(cari.toLowerCase()))
-            .map((community) => (
-              <CommunityItemCard key={community.id} community={community} />
+          {articles
+            .filter((article) => JSON.stringify(article).toLowerCase().includes(cari.toLowerCase()))
+            .map((article) => (
+              <ArticleItemCard key={article.id} article={article} />
             ))}
         </div>
       )}
@@ -164,4 +171,4 @@ const CommunityList: FC<Props> = ({ communities, query }) => {
   );
 };
 
-export default CommunityList;
+export default ArticleList;

@@ -66,4 +66,14 @@ class User extends Authenticatable implements HasMedia
             ->fit(Fit::Contain, 300, 300)
             ->nonQueued();
     }
+
+    public function community()
+    {
+        return $this->belongsTo(Community::class);
+    }
+
+    public function articles()
+    {
+        return $this->hasMany(Article::class, 'created_by');
+    }
 }

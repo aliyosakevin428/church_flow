@@ -33,4 +33,9 @@ class Community extends Model
         return $this->hasMany(Jemaat::class, 'komunitas_id');
     }
 
+    public function articles()
+    {
+        return $this->hasMany(Article::class, 'komunitas_id');
+    }
+
 }
