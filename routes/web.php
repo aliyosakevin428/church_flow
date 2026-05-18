@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\JemaatController;
+use App\Http\Controllers\ArticleController;
+
 
 
 
@@ -46,6 +48,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('jemaat/{jemaat}/restore', [JemaatController::class, 'restore'])->name('jemaat.restore');
     Route::delete('jemaat/{jemaat}/force-delete', [JemaatController::class, 'forceDelete'])->name('jemaat.force-delete');
     Route::apiResource('jemaat', JemaatController::class);
+    Route::put('article/bulk', [ArticleController::class, 'bulkUpdate'])->name('article.bulk.update');
+    Route::delete('article/bulk', [ArticleController::class, 'bulkDelete'])->name('article.bulk.destroy');
+    Route::post('article/{article}/upload-media', [ArticleController::class, 'uploadMedia'])->name('article.upload-media');
+    Route::apiResource('article', ArticleController::class);
 });
 
 require __DIR__.'/settings.php';
